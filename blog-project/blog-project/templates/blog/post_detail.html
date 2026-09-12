@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block title %}{{ post.title }} - BlogApp{% endblock %}
+{% block content %}
+    <div class="card shadow-sm">
+        {% if post.image %}
+            <img src="{{ post.image.url }}" class="card-img-top" style="max-height: 400px; object-fit: cover;" alt="{{ post.title }}">
+        {% endif %}
+        <div class="card-body">
+            {% if post.category %}
+                <span class="badge bg-secondary mb-2">{{ post.category.name }}</span>
+            {% endif %}
+            <h1 class="card-title">{{ post.title }}</h1>
+            <h6 class="card-subtitle mb-3 text-muted">
+                by {{ post.author.username }} &middot; {{ post.created_at|date:"M d, Y H:i" }}
+                {% if post.updated_at != post.created_at %}
+                    <br><small>Last updated: {{ post.updated_at|date:"M d, Y H:i" }}</small>
+                {% endif %}
+            </h6>
+            <p class="card-text" style="white-space: pre-line;">{{ post.content }}</p>
+
+            <div class="d-flex align-items-center gap-3 mt-3">
+                {% if user.is_authenticated %}
+                    <form method="post" action="{% url 'like_toggle' post.pk %}">
+                        {% csrf_token %}
+                        {% if user in post.likes.all %}
+                            <button type="submit" class="btn btn-danger btn-sm">❤ Unlike ({{ post.total_likes }})</button>
+                        {% else %}
+                            <button type="submit" class="btn btn-outline-danger btn-sm">🤍 Like ({{ post.total_likes }})</button>
+                        {% endif %}
+                    </form>
+                {% else %}
+                    <span class="text-muted">❤ {{ post.total_likes }} like{{ post.total_likes|pluralize }}</span>
+                {% endif %}
+            </div>
+
+            {% if user.is_authenticated and post.author == user %}
+                <hr>
+                <a href="{% url 'post_edit' post.pk %}" class="btn btn-warning btn-sm">Edit</a>
+                <a href="{% url 'post_delete' post.pk %}" class="btn btn-danger btn-sm">Delete</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <h4>Comments ({{ comments.count }})</h4>
+
+        {% if user.is_authenticated %}
+            <form method="post" class="mb-4">
+                {% csrf_token %}
+                {{ comment_form.content }}
+                {% if comment_form.content.errors %}<div class="text-danger small">{{ comment_form.content.errors }}</div>{% endif %}
+                <button type="submit" class="btn btn-primary btn-sm mt-2">Post Comment</button>
+            </form>
+        {% else %}
+            <p class="text-muted"><a href="{% url 'login' %}">Log in</a> to leave a comment.</p>
+        {% endif %}
+
+        {% for comment in comments %}
+            <div class="border-bottom py-2">
+                <strong>{{ comment.author.username }}</strong>
+                <small class="text-muted">&middot; {{ comment.created_at|date:"M d, Y H:i" }}</small>
+                <p class="mb-0">{{ comment.content }}</p>
+            </div>
+        {% empty %}
+            <p class="text-muted">No comments yet. Be the first to comment!</p>
+        {% endfor %}
+    </div>
+
+    <a href="{% url 'home' %}" class="btn btn-link mt-3">&larr; Back to all posts</a>
+{% endblock %}

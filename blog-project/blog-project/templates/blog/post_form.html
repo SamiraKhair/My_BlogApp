@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}{% if object %}Edit Post{% else %}New Post{% endif %} - BlogApp{% endblock %}
+{% block content %}
+    <h1 class="mb-4">{% if object %}Edit Post{% else %}Create New Post{% endif %}</h1>
+    <form method="post" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="{{ form.title.id_for_label }}" class="form-label">Title</label>
+            {{ form.title }}
+            {% if form.title.errors %}<div class="text-danger small">{{ form.title.errors }}</div>{% endif %}
+        </div>
+        <div class="mb-3">
+            <label for="{{ form.content.id_for_label }}" class="form-label">Content</label>
+            {{ form.content }}
+            {% if form.content.errors %}<div class="text-danger small">{{ form.content.errors }}</div>{% endif %}
+        </div>
+        <div class="mb-3">
+            <label for="{{ form.category.id_for_label }}" class="form-label">Category <small class="text-muted">(optional)</small></label>
+            {{ form.category }}
+            {% if form.category.errors %}<div class="text-danger small">{{ form.category.errors }}</div>{% endif %}
+        </div>
+        <div class="mb-3">
+            <label for="{{ form.image.id_for_label }}" class="form-label">Image <small class="text-muted">(optional)</small></label>
+            {% if object.image %}
+                <div class="mb-2"><img src="{{ object.image.url }}" style="max-height: 120px;" class="d-block rounded"></div>
+            {% endif %}
+            {{ form.image }}
+            {% if form.image.errors %}<div class="text-danger small">{{ form.image.errors }}</div>{% endif %}
+        </div>
+        <button type="submit" class="btn btn-primary">
+            {% if object %}Update{% else %}Submit{% endif %}
+        </button>
+        <a href="{% url 'home' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Delete Post - BlogApp{% endblock %}
+{% block content %}
+    <div class="card border-danger">
+        <div class="card-body">
+            <h4 class="card-title">Delete "{{ object.title }}"?</h4>
+            <p class="card-text">This action cannot be undone. Are you sure you want to permanently delete this post?</p>
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Yes, Delete</button>
+                <a href="{% url 'post_detail' object.pk %}" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+{% endblock %}
